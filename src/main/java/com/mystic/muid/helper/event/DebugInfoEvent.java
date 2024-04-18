@@ -11,7 +11,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.io.File;
 import java.io.IOException;
 
-
 @Mod.EventBusSubscriber
 public class DebugInfoEvent{
 

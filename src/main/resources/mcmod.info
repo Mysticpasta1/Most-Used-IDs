@@ -2,9 +2,9 @@
     {
         "modid": "muid",
         "name": "MUID",
-        "description": "For finding the total id's of popular ids",
-        "version": "1.2.0-12.12.2020-1.16.4-forge",
-        "mcversion": "1.12.2",
+        "description": "For finding the total id's of popular ids, and some QoL commands",
+        "version": "1.20.1-forge",
+        "mcversion": "1.20.1",
         "url": "",
         "updateUrl": "",
         "authorList": ["Mysticpasta1"],
