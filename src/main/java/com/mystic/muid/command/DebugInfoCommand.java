@@ -1,46 +1,44 @@
 package com.mystic.muid.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class DebugInfoCommand implements Command<CommandSource> {
+public class DebugInfoCommand implements Command<CommandSourceStack> {
 
     private static final DebugInfoCommand CMD = new DebugInfoCommand();
 
-    public static ArgumentBuilder<CommandSource, ?> register(CommandDispatcher<CommandSource> dispatcher) {
-        return Commands.literal("moddebuginfo")
-                .requires(cs -> cs.hasPermissionLevel(3))
+    public static LiteralArgumentBuilder<CommandSourceStack> register() {
+        return Commands.literal("idsizes")
+                .requires(cs -> cs.hasPermission(3))
                 .executes(CMD);
     }
 
     @Override
-    public int run(CommandContext<CommandSource> context){
-
+    public int run(CommandContext<CommandSourceStack> context) {
         try {
 
             String lineFromInput1 = " ";
 
             boolean append = false;
-            PrintStream out = new PrintStream(new FileOutputStream("MUIDoutput.txt", append));
+            createFile();
+            PrintStream out = new PrintStream(new FileOutputStream("MUID_Output.txt", append));
             System.setOut(out);
 
             ModList.get().getMods().forEach((modContainer -> {
-
                 int a = 0;
-                for (ResourceLocation resourceLocation : ForgeRegistries.BIOMES.getKeys()) {
+                for (ResourceLocation resourceLocation : context.getSource().getLevel().registryAccess().registry(ForgeRegistries.BIOMES.getRegistryKey()).get().keySet()) {
                     if (resourceLocation.toString().contains(modContainer.getModId())) {
                         a++;
                     }
@@ -70,13 +68,13 @@ public class DebugInfoCommand implements Command<CommandSource> {
                     }
                 }
                 int f = 0;
-                for (ResourceLocation resourceLocation : ForgeRegistries.TILE_ENTITIES.getKeys()) {
+                for (ResourceLocation resourceLocation : ForgeRegistries.BLOCK_ENTITY_TYPES.getKeys()) {
                     if (resourceLocation.toString().contains(modContainer.getModId())) {
                         f++;
                     }
                 }
                 int g = 0;
-                for (ResourceLocation resourceLocation : ForgeRegistries.ENTITIES.getKeys()) {
+                for (ResourceLocation resourceLocation : ForgeRegistries.ENTITY_TYPES.getKeys()) {
                     if (resourceLocation.toString().contains(modContainer.getModId())) {
                         g++;
                     }
@@ -84,7 +82,6 @@ public class DebugInfoCommand implements Command<CommandSource> {
 
                 out.println(lineFromInput1);
                 out.println(modContainer.getModId());
-
                 if(a > 0){
                     out.println("Number of Biome IDs Registered: " + a);
                 }
@@ -108,15 +105,27 @@ public class DebugInfoCommand implements Command<CommandSource> {
                 }
             }));
 
-            //close the file (VERY IMPORTANT!)
             out.close();
 
-            context.getSource().sendFeedback(new TranslationTextComponent("Mod Debug File Written :)"), false);
+            context.getSource().sendSystemMessage(Component.literal("Mod Debug File Written :)"));
 
         } catch (IOException e) {
             System.out.println("Error during reading/writing");
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public static void createFile(){
+        File myObj = new File("MUID_Output.txt");
+        try {
+            if (myObj.createNewFile()) {
+                System.out.println("File created: " + myObj.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("WTF Exploded");
+        }
     }
 }

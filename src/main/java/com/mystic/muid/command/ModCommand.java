@@ -1,19 +1,14 @@
 package com.mystic.muid.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.mystic.muid.util.reference;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 public class ModCommand
 {
-
-    public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralCommandNode<CommandSource> cmdDebug = dispatcher.register(
-                Commands.literal(reference.MODID)
-                        .then(DebugInfoCommand.register(dispatcher))
-        );
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("muid").then(DebugInfoCommand.register()));
+        dispatcher.register(Commands.literal("muid").then(TagsCommand.register()));
+        dispatcher.register(Commands.literal("muid").then(IdCommand.register()));
     }
-
 }

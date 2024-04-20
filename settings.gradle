@@ -11,10 +11,6 @@ pluginManagement {
                     useModule("${requested.id}:ForgeGradle:${requested.version}")
                     break
                 }
-                case "org.spongepowered.mixin": {
-                    useModule("org.spongepowered:mixingradle:${requested.version}")
-                    break;
-                }
             }
         }
     }
